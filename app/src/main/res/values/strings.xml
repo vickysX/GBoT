@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GBoT</string>
+    <string name="placeholder">Write something to your bestie</string>
+    <string name="send_icon">Send the message</string>
 </resources>
