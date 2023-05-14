@@ -2,4 +2,8 @@
     <string name="app_name">GBoT</string>
     <string name="placeholder">Write something to your bestie</string>
     <string name="send_icon">Send the message</string>
+    <string name="first_message">Hi Giulia, ask me everything you want!</string>
+    <string name="loading">I\'m writing…</string>
+    <string name="error_icon_description">Error icon</string>
+    <string name="error">Ops, something went wrong :(</string>
 </resources>
