@@ -7,7 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aallam.openai.api.completion.CompletionRequest
+import com.aallam.openai.api.BetaOpenAI
+import com.aallam.openai.api.chat.ChatCompletionRequest
+import com.aallam.openai.api.chat.ChatMessage
+import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.example.gbot.BuildConfig
@@ -28,15 +31,17 @@ class GbotViewModel : ViewModel() {
     )
     val messages : List<Message>
         get() = _messages
-
+    @OptIn(BetaOpenAI::class)
+    private val chatMessages : MutableList<ChatMessage> = mutableListOf()
     var userInput by mutableStateOf("")
-    private var prompt = ""
+    //private var prompt = ""
 
 
     fun updateUserInput(input : String) {
         userInput = input
     }
 
+    @OptIn(BetaOpenAI::class)
     fun appendMessageToChat() {
         _messages.add(
             Message(
@@ -45,21 +50,27 @@ class GbotViewModel : ViewModel() {
                 messageState = MutableStateFlow(MessageState.Success)
             )
         )
-        prompt += "\n" + userInput
+        chatMessages.add(
+            ChatMessage(
+                content = userInput,
+                role = ChatRole.User,
+            )
+        )
+        //prompt += "\n" + userInput
         userInput = ""
     }
 
-    private fun sendMessage() : CompletionRequest {
-        return CompletionRequest(
-            model = ModelId("text-davinci-003"),
-            prompt = prompt,
-            temperature = 0.9,
-            maxTokens = 150,
+    @OptIn(BetaOpenAI::class)
+    private fun sendMessage() : ChatCompletionRequest {
+        return ChatCompletionRequest(
+            model = ModelId("gpt-3.5-turbo"),
+            messages = chatMessages as List<ChatMessage>,
+            temperature = 0.7,
             topP = 1.0,
-            echo = false,
         )
     }
 
+    @OptIn(BetaOpenAI::class)
     fun getResponse() {
         viewModelScope.launch {
             _messages.add(
@@ -70,27 +81,24 @@ class GbotViewModel : ViewModel() {
             )
             Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
             try {
-                val completion = openAI.completion(sendMessage())
+                val completion = openAI.chatCompletion(sendMessage())
                 completion.choices.map {choice ->
-                    Log.d("VIEW MODEL", choice.text)
-                    _messages.last().body += "\n" + choice.text
-                    prompt += _messages.last().body
+                    Log.d("VIEW MODEL", choice.message!!.content)
+                    _messages.last().body += "\n" + choice.message!!.content
+                    //prompt += _messages.last().body
                     _messages.last().body = _messages.last().body.trim()
-                    /*_messages.add(
-                        Message(
-                            body = choice.text.trim(),
-                            isMine = false
-                        )
-                    )*/
-                    //prompt += "\n" + choice.text
-                }
-                _messages.last().messageState.update {
-                    MessageState.Success
+                    _messages.last().messageState.update {
+                        MessageState.Success
+                    }
+                    chatMessages.add(
+                        choice.message!!
+                    )
                 }
                 Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
                 _messages.forEach {
                     Log.d("MESSAGES", it.body)
                 }
+
             } catch (exception : Exception) {
                 exception.message?.let { Log.e("EXCEPTION", it) }
                 _messages.last().messageState.update {
