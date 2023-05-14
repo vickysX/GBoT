@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GBoT</string>
-    <string name="placeholder">Scrivi qualcosa al tuo migliore amico</string>
+    <string name="placeholder">Chiedi qualsiasi cosa</string>
     <string name="send_icon">Invia il messaggio</string>
     <string name="first_message">Ciao Giulia, chiedimi quello che vuoi!</string>
     <string name="loading">Sto scrivendo…</string>

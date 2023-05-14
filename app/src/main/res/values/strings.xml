@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GBoT</string>
-    <string name="placeholder">Write something to your bestie</string>
+    <string name="placeholder">Ask me everything</string>
     <string name="send_icon">Send the message</string>
     <string name="first_message">Hi Giulia, ask me everything you want!</string>
     <string name="loading">I\'m writing…</string>

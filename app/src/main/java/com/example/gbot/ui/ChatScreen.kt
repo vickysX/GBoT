@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,12 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gbot.R
 import com.example.gbot.model.Message
 import com.example.gbot.ui.theme.GBoTTheme
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +97,12 @@ fun MessageInput(
     value: String,
     onSubmit: () -> Unit
 ) {
-    BottomAppBar {
+    BottomAppBar(
+        contentPadding = PaddingValues(
+            start = 8.dp,
+            end = 8.dp
+        )
+    ) {
         OutlinedTextField(
             value = value,
             onValueChange = { onChange(it) },
@@ -118,7 +127,6 @@ fun MessageInput(
             modifier = Modifier
                 .fillMaxSize()
                 .wrapContentHeight(Alignment.CenterVertically)
-
         )
     }
 }
@@ -134,8 +142,8 @@ fun MessagesList(
             .fillMaxSize(),
         state = scrollState,
         reverseLayout = true,
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         messages.reversed().forEach {
             item {
@@ -161,12 +169,10 @@ fun MessageBox(
         when (state.value) {
             MessageState.Loading -> MessageLoading()
             MessageState.Success -> MessageSuccess(
-                message = message
+                message = message,
             )
-
             else -> MessageError()
         }
-
     }
 }
 
@@ -176,7 +182,7 @@ fun MessageLoading(
 ) {
     Text(
         text = stringResource(id = R.string.loading),
-        modifier = modifier.padding(4.dp)
+        modifier = modifier.padding(8.dp)
     )
 }
 
@@ -185,35 +191,70 @@ fun MessageSuccess(
     modifier: Modifier = Modifier,
     message: Message
 ) {
-    Card(
-        shape = when {
-            message.isMine -> RoundedCornerShape(
-                topStart = 15.dp,
-                topEnd = 15.dp,
-                bottomStart = 15.dp,
-                bottomEnd = 0.dp
-            )
+    Row() {
+        if (message.isMine) {
+            Spacer(Modifier.weight(1f))
+        }
+        Card(
+            shape = when {
+                message.isMine -> RoundedCornerShape(
+                    topStart = 15.dp,
+                    topEnd = 15.dp,
+                    bottomStart = 15.dp,
+                    bottomEnd = 0.dp
+                )
 
-            else -> RoundedCornerShape(
-                topStart = 0.dp,
-                topEnd = 15.dp,
-                bottomStart = 15.dp,
-                bottomEnd = 15.dp
+                else -> RoundedCornerShape(
+                    topStart = 0.dp,
+                    topEnd = 15.dp,
+                    bottomStart = 15.dp,
+                    bottomEnd = 15.dp
+                )
+            },
+            colors = CardDefaults.cardColors(
+                containerColor = when {
+                    message.isMine -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.inversePrimary
+                }
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            modifier = modifier
+                .padding(4.dp)
+                .weight(3f)
+        ) {
+            Text(
+                text = message.body,
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    end = 12.dp,
+                    top = 10.dp,
+                    bottom = 4.dp
+                ),
+                fontSize = 18.sp
             )
-        },
-        colors = CardDefaults.cardColors(
-            containerColor = when {
-                message.isMine -> MaterialTheme.colorScheme.primary
-                else -> MaterialTheme.colorScheme.inversePrimary
-            }
-        ),
-        modifier = modifier.padding(4.dp)
-    ) {
-        Text(
-            text = message.body,
-            modifier = Modifier.padding(8.dp)
-        )
+            Text(
+                text = message.timeStamp!!.format(
+                    DateTimeFormatter.ofPattern("kk:mm")
+                ),
+                textAlign = TextAlign.End,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .padding(
+                        start = 12.dp,
+                        bottom = 10.dp,
+                        end = 12.dp,
+                        top = 4.dp
+                    )
+                    .align(Alignment.End)
+            )
+        }
+        if (!message.isMine) {
+            Spacer(Modifier.weight(1f))
+        }
     }
+
 }
 
 @Composable
@@ -221,7 +262,7 @@ fun MessageError(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.padding(4.dp)
+        modifier = modifier.padding(8.dp)
     ) {
         Icon(
             imageVector = Icons.Default.Error,

@@ -15,28 +15,47 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.example.gbot.BuildConfig
 import com.example.gbot.model.Message
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalTime
+import java.time.ZoneId
 
 class GbotViewModel : ViewModel() {
 
     private val openAI = OpenAI(BuildConfig.OPEN_AI_API_KEY)
+
     private var _messages  = mutableStateListOf(
         Message(
             body = "Ciao Giulia, chiedimi quello che vuoi!",
             isMine = false,
-            messageState = MutableStateFlow(MessageState.Success)
+            messageState = MutableStateFlow(MessageState.Loading),
+            timeStamp = LocalTime.now(ZoneId.systemDefault())
         )
     )
     val messages : List<Message>
         get() = _messages
+
     @OptIn(BetaOpenAI::class)
-    private val chatMessages : MutableList<ChatMessage> = mutableListOf()
+    private val chatMessages : MutableList<ChatMessage> = mutableListOf(
+        ChatMessage(
+            content = "Ciao Giulia, chiedimi quello che vuoi!",
+            role = ChatRole.System
+        )
+    )
+
     var userInput by mutableStateOf("")
     //private var prompt = ""
 
-
+    init {
+        viewModelScope.launch {
+            delay(1000L)
+            _messages[0].messageState.update {
+                MessageState.Success
+            }
+        }
+    }
     fun updateUserInput(input : String) {
         userInput = input
     }
@@ -47,7 +66,8 @@ class GbotViewModel : ViewModel() {
             Message(
                 body = userInput,
                 isMine = true,
-                messageState = MutableStateFlow(MessageState.Success)
+                messageState = MutableStateFlow(MessageState.Success),
+                timeStamp = LocalTime.now(ZoneId.systemDefault())
             )
         )
         chatMessages.add(
@@ -77,7 +97,9 @@ class GbotViewModel : ViewModel() {
                 Message(
                     body = "",
                     isMine = false,
-                    messageState = MutableStateFlow(MessageState.Loading))
+                    messageState = MutableStateFlow(MessageState.Loading),
+                    timeStamp = LocalTime.now(ZoneId.systemDefault())
+                )
             )
             Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
             try {
@@ -87,6 +109,8 @@ class GbotViewModel : ViewModel() {
                     _messages.last().body += "\n" + choice.message!!.content
                     //prompt += _messages.last().body
                     _messages.last().body = _messages.last().body.trim()
+                    _messages.last().timeStamp = LocalTime
+                        .now(ZoneId.systemDefault())
                     _messages.last().messageState.update {
                         MessageState.Success
                     }
@@ -98,7 +122,6 @@ class GbotViewModel : ViewModel() {
                 _messages.forEach {
                     Log.d("MESSAGES", it.body)
                 }
-
             } catch (exception : Exception) {
                 exception.message?.let { Log.e("EXCEPTION", it) }
                 _messages.last().messageState.update {
