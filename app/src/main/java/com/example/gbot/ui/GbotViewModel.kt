@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.completion.CompletionRequest
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
+import com.example.gbot.BuildConfig
 import com.example.gbot.model.Message
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class GbotViewModel : ViewModel() {
 
-    private val openAI = OpenAI("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")
+    private val openAI = OpenAI(BuildConfig.OPEN_AI_API_KEY)
     private var _messages  = mutableStateListOf(
         Message(
             body = "Ciao Giulia, chiedimi quello che vuoi!",
@@ -60,7 +61,6 @@ class GbotViewModel : ViewModel() {
     }
 
     fun getResponse() {
-
         viewModelScope.launch {
             _messages.add(
                 Message(
@@ -71,7 +71,6 @@ class GbotViewModel : ViewModel() {
             Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
             try {
                 val completion = openAI.completion(sendMessage())
-
                 completion.choices.map {choice ->
                     Log.d("VIEW MODEL", choice.text)
                     _messages.last().body += "\n" + choice.text
