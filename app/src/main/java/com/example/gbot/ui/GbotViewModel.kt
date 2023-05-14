@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class GbotViewModel : ViewModel() {
 
-    private val openAI = OpenAI("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")
+    private val openAI = OpenAI("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")
     private var _messages  = mutableStateListOf(
         Message(
             body = "Ciao Giulia, chiedimi quello che vuoi!",
@@ -93,6 +93,7 @@ class GbotViewModel : ViewModel() {
                     Log.d("MESSAGES", it.body)
                 }
             } catch (exception : Exception) {
+                exception.message?.let { Log.e("EXCEPTION", it) }
                 _messages.last().messageState.update {
                     MessageState.Error
                 }

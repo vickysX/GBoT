@@ -128,10 +128,11 @@ fun MessagesList(
         modifier = modifier
             .fillMaxSize(),
         state = scrollState,
+        reverseLayout = true,
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        messages.forEach {
+        messages.reversed().forEach {
             item {
                 MessageBox(message = it)
             }
