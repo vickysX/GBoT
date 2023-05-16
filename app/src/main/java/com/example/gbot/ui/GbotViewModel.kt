@@ -28,10 +28,11 @@ class GbotViewModel : ViewModel() {
 
     private var _messages  = mutableStateListOf(
         Message(
-            body = "Ciao Giulia, chiedimi quello che vuoi!",
+            content = "Ciao Giulia, chiedimi quello che vuoi!",
             isMine = false,
             messageState = MutableStateFlow(MessageState.Loading),
-            timeStamp = LocalTime.now(ZoneId.systemDefault())
+            timeStamp = LocalTime.now(ZoneId.systemDefault()),
+            isAudio = false
         )
     )
     val messages : List<Message>
@@ -44,7 +45,7 @@ class GbotViewModel : ViewModel() {
             role = ChatRole.System
         )
     )
-
+    var audioMode by mutableStateOf(true)
     var userInput by mutableStateOf("")
     //private var prompt = ""
 
@@ -56,18 +57,24 @@ class GbotViewModel : ViewModel() {
             }
         }
     }
+
+    fun switchMessageMode() {
+        audioMode = !userInput.isNotEmpty()
+    }
     fun updateUserInput(input : String) {
         userInput = input
+        audioMode = !userInput.isNotEmpty()
     }
 
     @OptIn(BetaOpenAI::class)
     fun appendMessageToChat() {
         _messages.add(
             Message(
-                body = userInput,
+                content = userInput,
                 isMine = true,
                 messageState = MutableStateFlow(MessageState.Success),
-                timeStamp = LocalTime.now(ZoneId.systemDefault())
+                timeStamp = LocalTime.now(ZoneId.systemDefault()),
+                isAudio = false
             )
         )
         chatMessages.add(
@@ -95,10 +102,11 @@ class GbotViewModel : ViewModel() {
         viewModelScope.launch {
             _messages.add(
                 Message(
-                    body = "",
+                    content = "",
                     isMine = false,
                     messageState = MutableStateFlow(MessageState.Loading),
-                    timeStamp = LocalTime.now(ZoneId.systemDefault())
+                    timeStamp = LocalTime.now(ZoneId.systemDefault()),
+                    isAudio = false
                 )
             )
             Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
@@ -106,9 +114,9 @@ class GbotViewModel : ViewModel() {
                 val completion = openAI.chatCompletion(sendMessage())
                 completion.choices.map {choice ->
                     Log.d("VIEW MODEL", choice.message!!.content)
-                    _messages.last().body += "\n" + choice.message!!.content
+                    _messages.last().content += "\n" + choice.message!!.content
                     //prompt += _messages.last().body
-                    _messages.last().body = _messages.last().body.trim()
+                    _messages.last().content = _messages.last().content.trim()
                     _messages.last().timeStamp = LocalTime
                         .now(ZoneId.systemDefault())
                     _messages.last().messageState.update {
@@ -120,7 +128,7 @@ class GbotViewModel : ViewModel() {
                 }
                 Log.d("MESSAGE STATUS", _messages.last().messageState.value.name)
                 _messages.forEach {
-                    Log.d("MESSAGES", it.body)
+                    Log.d("MESSAGES", it.content)
                 }
             } catch (exception : Exception) {
                 exception.message?.let { Log.e("EXCEPTION", it) }

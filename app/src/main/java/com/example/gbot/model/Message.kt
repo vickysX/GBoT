@@ -5,10 +5,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalTime
 
 data class Message(
-    var body: String,
+    var content: String,
     val isMine: Boolean,
     var timeStamp: LocalTime? = null,
-    var messageState: MutableStateFlow<MessageState>
+    var messageState: MutableStateFlow<MessageState>,
+    val isAudio : Boolean
 )
 
 

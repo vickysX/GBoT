@@ -6,4 +6,5 @@
     <string name="loading">I\'m writing…</string>
     <string name="error_icon_description">Error icon</string>
     <string name="error">Ops, something went wrong :(</string>
+    <string name="mic_icon">Send audio message</string>
 </resources>

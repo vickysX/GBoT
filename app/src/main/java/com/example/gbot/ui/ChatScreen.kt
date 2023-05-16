@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
@@ -62,7 +63,9 @@ fun ChatScreen(
                 onSubmit = {
                     viewModel.appendMessageToChat()
                     viewModel.getResponse()
-                }
+                },
+                switchMessageMode = {viewModel.switchMessageMode()},
+                audioMode = viewModel.audioMode
             )
         }
     ) { paddingValues ->
@@ -94,6 +97,8 @@ fun ChatTopBar(
 fun MessageInput(
     modifier: Modifier = Modifier,
     onChange: (String) -> Unit,
+    switchMessageMode : () -> Unit,
+    audioMode : Boolean,
     value: String,
     onSubmit: () -> Unit
 ) {
@@ -105,7 +110,10 @@ fun MessageInput(
     ) {
         OutlinedTextField(
             value = value,
-            onValueChange = { onChange(it) },
+            onValueChange = {
+                onChange(it)
+                //switchMessageMode()
+            },
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.placeholder),
@@ -113,13 +121,21 @@ fun MessageInput(
             },
             shape = RoundedCornerShape(50),
             trailingIcon = {
-                IconButton(onClick = onSubmit) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = stringResource(id = R.string.send_icon),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                    IconButton(onClick = onSubmit) {
+                        Icon(
+                            imageVector = if (audioMode) {
+                                Icons.Default.Mic
+                            } else {
+                                Icons.Default.Send
+                            },
+                            contentDescription = if (audioMode) {
+                                stringResource(id = R.string.mic_icon)
+                            } else {
+                                stringResource(id = R.string.send_icon)
+                            },
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences
@@ -221,11 +237,17 @@ fun MessageSuccess(
                 defaultElevation = 4.dp
             ),
             modifier = modifier
-                .padding(4.dp)
+                .padding(
+                    top = 4.dp,
+                    bottom = 4.dp,
+                    start = if (message.isMine) 48.dp else 4.dp,
+                    end = if (message.isMine) 4.dp else 36.dp
+                )
                 .weight(3f)
+
         ) {
             Text(
-                text = message.body,
+                text = message.content,
                 modifier = Modifier.padding(
                     start = 12.dp,
                     end = 12.dp,
@@ -299,7 +321,9 @@ fun BottomBarPreview() {
         MessageInput(
             onChange = {},
             value = "",
-            onSubmit = {}
+            onSubmit = {},
+            switchMessageMode = {},
+            audioMode = false
         )
     }
 }
