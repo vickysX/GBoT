@@ -84,6 +84,7 @@ private val DarkColorScheme = darkColorScheme(
 fun GBoTTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
+    // isGiuliaTheme : Boolean = true
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

@@ -1,5 +1,6 @@
 package com.example.gbot.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,14 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,9 +32,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,24 +53,30 @@ import com.example.gbot.model.Message
 import com.example.gbot.ui.theme.GBoTTheme
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     modifier: Modifier = Modifier,
-    viewModel: GbotViewModel = viewModel()
+    viewModel: GBoTViewModel = viewModel()
 ) {
-    val messages = viewModel.messages
+    //val messages = viewModel.messages
+    val themeState = viewModel.themeState.collectAsState()
+    val messagesState = viewModel.chat.collectAsState()
     Scaffold(
         topBar = {
-            ChatTopBar()
+            ChatTopBar(
+                deleteMessages = {viewModel.deleteChat()},
+                themeState = themeState.value,
+                toggleTheme = {viewModel.toggleAppTheme(it)}
+            )
         },
         bottomBar = {
             MessageInput(
                 onChange = { viewModel.updateUserInput(it) },
                 value = viewModel.userInput,
                 onSubmit = {
-                    viewModel.appendMessageToChat()
-                    viewModel.getResponse()
+                    viewModel.onMessageSent()
+                    //viewModel.appendMessageToChat()
+                    //viewModel.getResponse()
                 },
                 switchMessageMode = {viewModel.switchMessageMode()},
                 audioMode = viewModel.audioMode
@@ -70,7 +84,7 @@ fun ChatScreen(
         }
     ) { paddingValues ->
         MessagesList(
-            messages = messages,
+            messages = messagesState.value.messages,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxHeight()
@@ -81,15 +95,100 @@ fun ChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatTopBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    themeState : GBoTUIState.ThemeState,
+    toggleTheme : (Boolean) -> Unit,
+    deleteMessages: () -> Unit
 ) {
+    val isGiuliaTheme = themeState.isGiuliaTheme
+    val openDeleteDialog = rememberSaveable {
+        mutableStateOf(false)
+    }
     TopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.app_name)
             )
+        },
+        actions = {
+            IconButton(
+                onClick = {
+                    toggleTheme(!isGiuliaTheme)
+                }
+            ) {
+                Icon(
+                    imageVector = themeState.toggleIcon,
+                    contentDescription = stringResource(
+                        id = themeState.toggleIconDescription
+                    )
+                )
+            }
+            IconButton(onClick = {
+                openDeleteDialog.value = true
+            }) {
+                Icon(
+                    imageVector = Icons.Default.DeleteSweep,
+                    contentDescription = stringResource(
+                        id = R.string.delete_chat
+                    )
+                )
+            }
         }
     )
+    if (openDeleteDialog.value) {
+        ChatDeletionDialog(
+            openDeleteDialog = openDeleteDialog,
+            deleteMessages = deleteMessages
+        )
+    }
+}
+
+@Composable
+fun ChatDeletionDialog(
+    modifier: Modifier = Modifier,
+    openDeleteDialog : MutableState<Boolean>,
+    deleteMessages : () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { openDeleteDialog.value = false },
+        title = {
+            Text(
+                text = stringResource(
+                    id = R.string.del_dialog_title
+                )
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(
+                    id = R.string.del_dialog_text
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                deleteMessages()
+                openDeleteDialog.value = false
+            }) {
+                Text(
+                    text = stringResource(
+                        id = R.string.del_dialog_confirm
+                    )
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                openDeleteDialog.value = false
+            }) {
+                Text(
+                    text = stringResource(
+                        id = R.string.del_dialog_dismiss
+                    )
+                )
+            }
+        }
+    ) 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,6 +246,7 @@ fun MessageInput(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessagesList(
     modifier: Modifier = Modifier,
@@ -163,8 +263,18 @@ fun MessagesList(
     ) {
         messages.reversed().forEach {
             item {
-                MessageBox(message = it)
+                MessageBox(
+                    message = it,
+                    modifier = Modifier.animateItemPlacement()
+                )
             }
+        }
+        item {
+            Text(
+                text = stringResource(id = R.string.chat_header),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().wrapContentWidth(Alignment.CenterHorizontally)
+            )
         }
     }
 }
@@ -207,7 +317,7 @@ fun MessageSuccess(
     modifier: Modifier = Modifier,
     message: Message
 ) {
-    Row() {
+    Row {
         if (message.isMine) {
             Spacer(Modifier.weight(1f))
         }
@@ -247,7 +357,7 @@ fun MessageSuccess(
 
         ) {
             Text(
-                text = message.content,
+                text = message.textContent,
                 modifier = Modifier.padding(
                     start = 12.dp,
                     end = 12.dp,
@@ -257,7 +367,7 @@ fun MessageSuccess(
                 fontSize = 18.sp
             )
             Text(
-                text = message.timeStamp!!.format(
+                text = message.timestamp!!.format(
                     DateTimeFormatter.ofPattern("kk:mm")
                 ),
                 textAlign = TextAlign.End,
@@ -317,7 +427,7 @@ fun MessagesListPreview() {
 @Composable
 @Preview
 fun BottomBarPreview() {
-    GBoTTheme() {
+    GBoTTheme {
         MessageInput(
             onChange = {},
             value = "",

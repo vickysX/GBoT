@@ -7,4 +7,12 @@
     <string name="error_icon_description">Error icon</string>
     <string name="error">Ops, something went wrong :(</string>
     <string name="mic_icon">Send audio message</string>
+    <string name="toggle_giulia">Giulia Theme</string>
+    <string name="toggle_marsela">Marsela Theme</string>
+    <string name="delete_chat">Delete Chat</string>
+    <string name="del_dialog_title">Delete Chat</string>
+    <string name="del_dialog_text">Are you sure you want to delete the chat?</string>
+    <string name="del_dialog_confirm">Yes</string>
+    <string name="del_dialog_dismiss">No</string>
+    <string name="chat_header">Ask me everything you want</string>
 </resources>

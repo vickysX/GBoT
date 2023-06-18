@@ -8,4 +8,12 @@
     <string name="error_icon_description">Icona di errore</string>
     <string name="error">Ops, qualcosa è andato storto :(</string>
     <string name="mic_icon">Invia messaggio vocale</string>
+    <string name="toggle_giulia">Tema Giulia</string>
+    <string name="toggle_marsela">Tema Marsela</string>
+    <string name="delete_chat">Cancella messaggi</string>
+    <string name="del_dialog_title">Elimina chat</string>
+    <string name="del_dialog_text">Sei sicura di voler eliminare definitivamente la chat?</string>
+    <string name="del_dialog_confirm">Sì</string>
+    <string name="del_dialog_dismiss">No</string>
+    <string name="chat_header">Chiedimi quello che vuoi</string>
 </resources>
