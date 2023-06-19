@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColorScheme = lightColorScheme(
+private val GiuliaLightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -48,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 
-private val DarkColorScheme = darkColorScheme(
+private val GiuliaDarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,
@@ -80,11 +80,75 @@ private val DarkColorScheme = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
+private val MarsLightColorScheme = lightColorScheme(
+    primary = mars_theme_light_primary,
+    onPrimary = mars_theme_light_onPrimary,
+    primaryContainer = mars_theme_light_primaryContainer,
+    onPrimaryContainer = mars_theme_light_onPrimaryContainer,
+    secondary = mars_theme_light_secondary,
+    onSecondary = mars_theme_light_onSecondary,
+    secondaryContainer = mars_theme_light_secondaryContainer,
+    onSecondaryContainer = mars_theme_light_onSecondaryContainer,
+    tertiary = mars_theme_light_tertiary,
+    onTertiary = mars_theme_light_onTertiary,
+    tertiaryContainer = mars_theme_light_tertiaryContainer,
+    onTertiaryContainer = mars_theme_light_onTertiaryContainer,
+    error = mars_theme_light_error,
+    errorContainer = mars_theme_light_errorContainer,
+    onError = mars_theme_light_onError,
+    onErrorContainer = mars_theme_light_onErrorContainer,
+    background = mars_theme_light_background,
+    onBackground = mars_theme_light_onBackground,
+    surface = mars_theme_light_surface,
+    onSurface = mars_theme_light_onSurface,
+    surfaceVariant = mars_theme_light_surfaceVariant,
+    onSurfaceVariant = mars_theme_light_onSurfaceVariant,
+    outline = mars_theme_light_outline,
+    inverseOnSurface = mars_theme_light_inverseOnSurface,
+    inverseSurface = mars_theme_light_inverseSurface,
+    inversePrimary = mars_theme_light_inversePrimary,
+    surfaceTint = mars_theme_light_surfaceTint,
+    outlineVariant = mars_theme_light_outlineVariant,
+    scrim = mars_theme_light_scrim,
+)
+
+private val MarsDarkColorScheme = darkColorScheme(
+    primary = mars_theme_dark_primary,
+    onPrimary = mars_theme_dark_onPrimary,
+    primaryContainer = mars_theme_dark_primaryContainer,
+    onPrimaryContainer = mars_theme_dark_onPrimaryContainer,
+    secondary = mars_theme_dark_secondary,
+    onSecondary = mars_theme_dark_onSecondary,
+    secondaryContainer = mars_theme_dark_secondaryContainer,
+    onSecondaryContainer = mars_theme_dark_onSecondaryContainer,
+    tertiary = mars_theme_dark_tertiary,
+    onTertiary = mars_theme_dark_onTertiary,
+    tertiaryContainer = mars_theme_dark_tertiaryContainer,
+    onTertiaryContainer = mars_theme_dark_onTertiaryContainer,
+    error = mars_theme_dark_error,
+    errorContainer = mars_theme_dark_errorContainer,
+    onError = mars_theme_dark_onError,
+    onErrorContainer = mars_theme_dark_onErrorContainer,
+    background = mars_theme_dark_background,
+    onBackground = mars_theme_dark_onBackground,
+    surface = mars_theme_dark_surface,
+    onSurface = mars_theme_dark_onSurface,
+    surfaceVariant = mars_theme_dark_surfaceVariant,
+    onSurfaceVariant = mars_theme_dark_onSurfaceVariant,
+    outline = mars_theme_dark_outline,
+    inverseOnSurface = mars_theme_dark_inverseOnSurface,
+    inverseSurface = mars_theme_dark_inverseSurface,
+    inversePrimary = mars_theme_dark_inversePrimary,
+    surfaceTint = mars_theme_dark_surfaceTint,
+    outlineVariant = mars_theme_dark_outlineVariant,
+    scrim = mars_theme_dark_scrim,
+)
+
 @Composable
 fun GBoTTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    // isGiuliaTheme : Boolean = true
+    isGiuliaTheme : Boolean,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -94,8 +158,13 @@ fun GBoTTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme && isGiuliaTheme -> GiuliaDarkColorScheme
+        darkTheme && !isGiuliaTheme -> MarsDarkColorScheme
+        else -> if (isGiuliaTheme) {
+            GiuliaLightColorScheme
+        } else {
+            MarsLightColorScheme
+        }
     }
     val view = LocalView.current
     if (!view.isInEditMode) {

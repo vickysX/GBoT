@@ -44,13 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gbot.R
 import com.example.gbot.model.Message
-import com.example.gbot.ui.theme.GBoTTheme
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -410,30 +408,4 @@ fun MessageError(
     }
 }
 
-/*@Composable
-@Preview()
-fun MessagesListPreview() {
-    GBoTTheme {
-        MessagesList(
-            messages = mutableListOf(
-                Message("Ciao", false),
-                Message("Vaffanculo", true)
-            ),
-            scrollState = rememberLazyListState()
-        )
-    }
-}*/
 
-@Composable
-@Preview
-fun BottomBarPreview() {
-    GBoTTheme {
-        MessageInput(
-            onChange = {},
-            value = "",
-            onSubmit = {},
-            switchMessageMode = {},
-            audioMode = false
-        )
-    }
-}
