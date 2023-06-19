@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.time.LocalTime
 import java.time.ZoneId
 
@@ -58,7 +57,7 @@ class GetMessageUseCase(
                 lastMessage.messageState.update {
                     MessageState.Success
                 }
-            } catch (exception : IOException) {
+            } catch (exception : Exception) {
                 lastMessage.messageState.update {
                     MessageState.Error
                 }

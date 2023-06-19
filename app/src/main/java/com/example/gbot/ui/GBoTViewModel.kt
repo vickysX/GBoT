@@ -120,6 +120,7 @@ class GBoTViewModel(
             getMessageUseCase(sendTextMessageUseCase(userInput, false))
         }
         userInput = ""
+        audioMode = userInput.isEmpty()
     }
 
     @OptIn(BetaOpenAI::class)
