@@ -7,7 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.aallam.openai.client.OpenAI
 import com.example.gbot.BuildConfig
 import com.example.gbot.domain.GetMessageUseCase
-import com.example.gbot.domain.SendMessageUseCase
+import com.example.gbot.domain.SendAudioMessageUseCase
+import com.example.gbot.domain.SendTextMessageUseCase
 
 private const val OPEN_AI_API_KEY = BuildConfig.OPEN_AI_API_KEY
 private const val THEME_PREFERENCE_NAME = "theme_preferences"
@@ -19,7 +20,8 @@ interface AppContainer {
     val chatRepository : ChatRepository
     //val openAIRepository : OpenAIRepository
     val userPreferencesRepository : UserPreferencesRepository
-    val sendMessageUseCase : SendMessageUseCase
+    val sendTextMessageUseCase : SendTextMessageUseCase
+    val sendAudioMessageUseCase : SendAudioMessageUseCase
     val getMessageUseCase : GetMessageUseCase
 }
 
@@ -38,7 +40,9 @@ class GBoTAppContainer(private val context: Context) : AppContainer {
 
     override val userPreferencesRepository = UserPreferencesRepository(context.dataStore)
 
-    override val sendMessageUseCase : SendMessageUseCase = SendMessageUseCase(chatRepository)
+    override val sendTextMessageUseCase : SendTextMessageUseCase = SendTextMessageUseCase(chatRepository)
     override val getMessageUseCase : GetMessageUseCase =
         GetMessageUseCase(chatRepository, openAIRepository)
+    override val sendAudioMessageUseCase : SendAudioMessageUseCase =
+        SendAudioMessageUseCase(openAIRepository, chatRepository)
 }

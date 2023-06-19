@@ -13,7 +13,8 @@ import com.example.gbot.GBoTApplication
 import com.example.gbot.data.ChatRepository
 import com.example.gbot.data.UserPreferencesRepository
 import com.example.gbot.domain.GetMessageUseCase
-import com.example.gbot.domain.SendMessageUseCase
+import com.example.gbot.domain.SendAudioMessageUseCase
+import com.example.gbot.domain.SendTextMessageUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -24,7 +25,8 @@ class GBoTViewModel(
     private val chatRepository: ChatRepository,
     //private val openAIRepository: OpenAIRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val sendMessageUseCase: SendMessageUseCase,
+    private val sendAudioMessageUseCase: SendAudioMessageUseCase,
+    private val sendTextMessageUseCase: SendTextMessageUseCase,
     private val getMessageUseCase: GetMessageUseCase
 ) : ViewModel() {
 
@@ -112,12 +114,24 @@ class GBoTViewModel(
     }
 
     @OptIn(BetaOpenAI::class)
-    fun onMessageSent() {
+    fun onTextMessageSent() {
 
         viewModelScope.launch {
-            getMessageUseCase(sendMessageUseCase(userInput))
+            getMessageUseCase(sendTextMessageUseCase(userInput, false))
         }
         userInput = ""
+    }
+
+    @OptIn(BetaOpenAI::class)
+    fun onAudioMessageSent() {
+        val fileName = ""
+        viewModelScope.launch {
+            getMessageUseCase(
+                sendTextMessageUseCase(
+                    sendAudioMessageUseCase(fileName), true
+                )
+            )
+        }
     }
 
     /*@OptIn(BetaOpenAI::class)
@@ -237,15 +251,15 @@ class GBoTViewModel(
             initializer {
                 val appContainer = (this[APPLICATION_KEY] as GBoTApplication).appContainer
                 val chatRepository = appContainer.chatRepository
-                //val openAIRepository = appContainer.openAIRepository
                 val userPreferencesRepository = appContainer.userPreferencesRepository
-                val sendMessageUseCase = appContainer.sendMessageUseCase
+                val sendTextMessageUseCase = appContainer.sendTextMessageUseCase
+                val sendAudioMessageUseCase = appContainer.sendAudioMessageUseCase
                 val getMessageUseCase = appContainer.getMessageUseCase
                 GBoTViewModel(
                     chatRepository = chatRepository,
-                    //openAIRepository = openAIRepository,
                     userPreferencesRepository = userPreferencesRepository,
-                    sendMessageUseCase = sendMessageUseCase,
+                    sendTextMessageUseCase = sendTextMessageUseCase,
+                    sendAudioMessageUseCase = sendAudioMessageUseCase,
                     getMessageUseCase = getMessageUseCase
                 )
             }

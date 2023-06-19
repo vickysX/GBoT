@@ -74,7 +74,7 @@ fun ChatScreen(
                 onChange = { viewModel.updateUserInput(it) },
                 value = viewModel.userInput,
                 onSubmit = {
-                    viewModel.onMessageSent()
+                    viewModel.onTextMessageSent()
                     //viewModel.appendMessageToChat()
                     //viewModel.getResponse()
                 },
