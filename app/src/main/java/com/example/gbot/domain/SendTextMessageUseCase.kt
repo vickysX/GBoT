@@ -16,14 +16,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.ZoneId
+import javax.inject.Inject
 
-class SendTextMessageUseCase(
-    private val chatRepository: ChatRepository,
-    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-) {
+interface SendTextMessage {
+    @OptIn(BetaOpenAI::class)
+    suspend operator fun invoke(userInput: String, isAudio: Boolean) : ChatCompletionRequest
+}
+class SendTextMessageUseCase @Inject constructor(
+    /*private*/ val chatRepository: ChatRepository,
+    /*private*/ val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
+) :  SendTextMessage {
 
     @OptIn(BetaOpenAI::class)
-    suspend operator fun invoke(userInput: String, isAudio : Boolean): ChatCompletionRequest =
+    override suspend operator fun invoke(userInput: String, isAudio : Boolean): ChatCompletionRequest =
         withContext(defaultDispatcher) {
             if (!isAudio) {
                 val message = Message(

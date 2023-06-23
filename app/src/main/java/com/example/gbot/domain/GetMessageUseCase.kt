@@ -15,16 +15,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.ZoneId
+import javax.inject.Inject
 
-class GetMessageUseCase(
-    private val chatRepository : ChatRepository,
-    private val openAIRepository: OpenAIRepository,
-    private val defaultDispatcher : CoroutineDispatcher = Dispatchers.Default
-) {
+interface GetMessage {
+    @OptIn(BetaOpenAI::class)
+    suspend operator fun invoke(request: ChatCompletionRequest)
+}
+class GetMessageUseCase @Inject constructor(
+    /*private*/ val chatRepository : ChatRepository,
+    /*private*/ val openAIRepository: OpenAIRepository,
+    /*private*/ val defaultDispatcher : CoroutineDispatcher = Dispatchers.Default
+) : GetMessage {
 
 
     @OptIn(BetaOpenAI::class)
-    suspend operator fun invoke(request: ChatCompletionRequest) =
+    override suspend operator fun invoke(request: ChatCompletionRequest) =
         withContext(defaultDispatcher) {
             val message = Message(
                 textContent = "",

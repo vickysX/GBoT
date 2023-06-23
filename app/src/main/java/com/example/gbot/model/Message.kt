@@ -30,7 +30,9 @@ data class Message(
     @ColumnInfo(name = "audio_file_path")
     var audioFilePath : String? = null,
 
-    @Embedded var chatMessage: ChatMessageWrapper? = null
+    @Embedded var chatMessage: ChatMessageWrapper? = null,
+
+    var chatConversationId : Long = 0
 )
 
 

@@ -2,16 +2,20 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id "com.google.devtools.ksp"
+    id("kotlin-kapt")
+    id("com.ncorti.ktfmt.gradle") version "0.10.0"
+    id 'com.google.gms.google-services'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
     namespace 'com.example.gbot'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.gbot"
         minSdk 26
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
         buildConfigField("String", "OPEN_AI_API_KEY", "\"${System.getenv("OPEN_AI_API_KEY")}\"")
@@ -50,12 +54,16 @@ android {
     }
 }
 
+ktfmt {
+    googleStyle()
+}
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
-    //implementation 'androidx.navigation:navigation-compose:2.5.3'
+    implementation 'androidx.navigation:navigation-compose:2.6.0'
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation platform('androidx.compose:compose-bom:2023.06.00')
     implementation 'androidx.compose.ui:ui'
@@ -66,12 +74,18 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-extended:1.4.3'
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     implementation "androidx.room:room-runtime:2.5.1"
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation "com.google.dagger:hilt-android:2.44"
     ksp "androidx.room:room-compiler:2.5.1"
+    kapt "com.google.dagger:hilt-compiler:2.44"
     implementation "androidx.room:room-ktx:2.5.1"
     implementation 'com.google.accompanist:accompanist-permissions:0.31.2-alpha'
     implementation "com.aallam.openai:openai-client:3.2.3"
     implementation 'io.ktor:ktor-client-core:2.3.0'
     implementation 'io.ktor:ktor-client-android:2.3.0'
+    implementation platform('com.google.firebase:firebase-bom:32.1.1')
+    implementation "com.google.firebase:firebase-auth-ktx"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

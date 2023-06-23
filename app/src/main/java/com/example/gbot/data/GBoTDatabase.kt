@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.gbot.model.Message
+import com.example.gbot.model.Chat
 
-@Database(entities = [Message::class], version = 2)
+@Database(entities = [Message::class, Chat::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class GBoTDatabase : RoomDatabase() {
     abstract fun messageDao() : MessageDao

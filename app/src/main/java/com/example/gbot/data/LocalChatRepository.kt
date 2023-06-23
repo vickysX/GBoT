@@ -3,9 +3,10 @@ package com.example.gbot.data
 import com.example.gbot.model.ChatMessageWrapper
 import com.example.gbot.model.Message
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 
-class LocalChatRepository(private val messageDao: MessageDao) : ChatRepository {
+class LocalChatRepository @Inject constructor(val messageDao: MessageDao) : ChatRepository {
 
     override suspend fun deleteMessages() = messageDao.deleteMessages()
 
